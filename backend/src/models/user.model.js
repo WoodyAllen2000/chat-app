@@ -9,7 +9,7 @@ const userSchema = new mongoose.Schema(
             unique: true,
         },
 
-        fullname: {
+        fullName: {
             type: String,
             required: true,
         },
@@ -20,6 +20,7 @@ const userSchema = new mongoose.Schema(
             minlength: 6,
         },
 
+        // 默认为空
         profilePic: {
             type: String,
             default: "",

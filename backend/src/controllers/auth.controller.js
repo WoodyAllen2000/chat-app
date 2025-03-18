@@ -1,7 +1,62 @@
 // 身份验证逻辑实现
+import User from "../models/user.model.js";
+import bcrypt from "bcryptjs";
+import { generateToken } from "../lib/utils.js";
 
-export const signup = (req, res) => {
-    res.send("signup")
+export const signup = async (req, res) => {
+    const { fullName, email, password } = req.body; /* 从body中提取 */
+
+    try {
+        // 确保所有fields都有输入
+        if (!fullName || !email || !password) {
+            return res.status(400).json({ message: "All fields are required!" });
+        }
+
+        // 如果密码长度不够，向客户端发送响应状态吗400，并附带错误信息
+        if (password.length < 6) {
+            return res.status(400).json({ message: "Password must be at least 6 characters" });
+        }
+
+        const user = await User.findOne({email});
+
+        // 如果邮箱存在，说明已存在用户
+        if (user) {
+            return res.status(400).json({ message: "Email already exists"});
+        }
+
+        // 将密码加密后存储
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(password, salt);
+
+        const newUser = new User ({
+            fullName: fullName,
+            email: email,
+            password: hashedPassword,
+        })
+
+        if (newUser) {
+            // generate jwt token
+            generateToken(newUser._id, res );
+
+            // 保存到数据库中
+            await newUser.save();
+
+            // 返回成功状态
+            res.status(201).json({
+                _id: newUser._id,
+                fullName: newUser.fullName,
+                email: newUser.email,
+                profilePic: newUser.profilePic,
+            })
+
+        } else {
+            res.status(400).json({ message: "Invalid user data"});
+        }
+
+    } catch (error) {
+        console.log("Error in signup controller", error.message);
+        res.status(500).json({ message: "Internal server error"});
+    }
 };
 export const login = (req, res) => {
     res.send("login")
