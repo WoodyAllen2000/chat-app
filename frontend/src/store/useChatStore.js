@@ -3,7 +3,7 @@ import toast from "react-hot-toast";
 import { axiosInstance } from "../lib/axios";
 
 // 和用户和信息相关的状态存储
-export const useChatStore = create((set) => ({
+export const useChatStore = create((set, get) => ({
     messages: [],
     users: [],
     selectedUser: null,
@@ -32,6 +32,17 @@ export const useChatStore = create((set) => ({
             toast.error(error.response.data.message);
         } finally {
             set({ isMessageLoading: false });
+        }
+    },
+
+    sendMessage: async (messageData) => {
+        // 没办法直接得到状态，调用get
+        const { selectedUser, messages } = get();
+        try {
+            const res = await axiosInstance.post(`/messages/send/${selectedUser._id}`, messageData);
+            set({ messages: [...messages, res.data,] });
+        } catch (error) {
+            toast.error(error.response.data.message);
         }
     },
 
