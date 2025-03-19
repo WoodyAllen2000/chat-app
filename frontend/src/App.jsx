@@ -1,35 +1,56 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React, { useEffect } from 'react';
+import Navbar from './components/NavBar';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import HomePage from './pages/HomePage';
+import SignUpPage from './pages/SignUpPage';
+import LoginPage from './pages/LoginPage';
+import SettingsPage from './pages/SettingsPage';
+import ProfilePage from './pages/ProfilePage';
+import { useAuthStore } from './store/useAuthStore';
+import { Loader } from 'lucide-react';
+import { Toaster } from 'react-hot-toast';
 
-function App() {
-  const [count, setCount] = useState(0)
+const App = () => {
+  const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
+
+  // 检查是否登录
+  useEffect(() => {
+    checkAuth();
+  }, [checkAuth]);
+
+  console.log({ authUser });
+
+  // check时，加载loading界面
+  if (isCheckingAuth && !authUser) {
+    return (
+      <div className='flex items-center justify-center h-screen'>
+        <Loader className='size-10 animate-spin' />
+      </div>
+    );
+  }
 
   return (
     <>
       <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        {/* 先引入Navbar，在Navbar里面进行路由 */}
+        <Navbar />
+
+        <Routes>
+          {/* 首页是homepage */}
+          {/* 如果用户没有认证，跳转到login页面 */}
+          <Route path='/' element={authUser ? <HomePage /> : <Navigate to="/login" />}/>
+          {/* 如果用户已登录，不能出现signup和login界面，直接进入homepage */}
+          <Route path='/signup' element={!authUser ? <SignUpPage /> : <Navigate to="/" />}/>
+          <Route path='/login' element={!authUser ? <LoginPage /> : <Navigate to="/" />}/>
+          <Route path='/settings' element={<SettingsPage />}/>
+          <Route path='/profile' element={authUser ? <ProfilePage /> : <Navigate to="/login" />}/>
+
+        </Routes>
+
+        <Toaster />
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

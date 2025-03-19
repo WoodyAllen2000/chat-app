@@ -1,0 +1,67 @@
+import { create } from "zustand";
+import { axiosInstance } from "../lib/axios";
+import toast from "react-hot-toast";
+
+// create用来创建新的状态存储，参数是一个回调函数，返回一个对象定义状态存储的初始状态和更新逻辑，set是一个函数用来更新状态存储中的状态 
+export const useAuthStore = create((set) => ({
+    
+    authUser: null,
+    isSigningUp: false,
+    isLoggingIn: false,
+    isUpdatingProfile: false,
+
+    //每次刷新页面都要check
+    isCheckingAuth: true,
+
+    checkAuth: async () => {
+        try {
+            // 接收后端传来的res
+            const res = await axiosInstance.get("/auth/check");
+
+            // 修改状态 根据后端传来的User数据
+            set({ authUser: res.data });
+        } catch (error) {
+            console.log("Error in checkAuth", error);
+            set({ authUser: null });
+        } finally {
+            set ( { isCheckingAuth: false });
+        }
+    },
+
+    signup: async (data) => {
+        set({ isSigningUp: true });
+        try {
+            const res = await axiosInstance.post("/auth/signup", data);
+            set({ authUser: res.data});
+            toast.success("Account created successfully");
+            
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isSigningUp: false});
+        }
+    },
+
+    login: async (data) => {
+        set({ isLoggingIn: true });
+        try {
+            const res = await axiosInstance.post("/auth/login", data);
+            set({ authUser: res.data });
+            toast.success("Logged in successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        } finally {
+            set({ isLoggingIn: false });
+        }
+    },
+
+    logout: async () => {
+        try {
+            await axiosInstance.post("/auth/logout");
+            set({ authUser: null });
+            toast.success("Logged out successfully");
+        } catch (error) {
+            toast.error(error.response.data.message);
+        }
+    }
+}))

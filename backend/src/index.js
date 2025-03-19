@@ -4,6 +4,7 @@ import authRoutes from "./routes/auth.route.js"
 import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import messageRoutes from "./routes/message.route.js";
+import cors from "cors";
 
 dotenv.config(); 
 
@@ -17,6 +18,11 @@ app.use(express.json());
 
 // 让我能够解析cookie
 app.use(cookieParser());
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true,
+}))
 
 // use用于挂载中间件 当请求的 URL 以 /api/auth 开头时，Express 会将请求传递给 authRoutes 中定义的路由处理逻辑。
 app.use("/api/auth", authRoutes);
