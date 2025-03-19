@@ -7,10 +7,13 @@ import LoginPage from './pages/LoginPage';
 import SettingsPage from './pages/SettingsPage';
 import ProfilePage from './pages/ProfilePage';
 import { useAuthStore } from './store/useAuthStore';
+import { useThemeStore } from './store/useThemeStore';
 import { Loader } from 'lucide-react';
 import { Toaster } from 'react-hot-toast';
 
 const App = () => {
+  const { theme } = useThemeStore();
+
   const { authUser, checkAuth, isCheckingAuth } = useAuthStore();
 
   // 检查是否登录
@@ -31,7 +34,7 @@ const App = () => {
 
   return (
     <>
-      <div>
+      <div data-theme={ theme }>
         {/* 先引入Navbar，在Navbar里面进行路由 */}
         <Navbar />
 
