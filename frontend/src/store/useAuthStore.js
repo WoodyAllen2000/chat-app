@@ -9,6 +9,7 @@ export const useAuthStore = create((set) => ({
     isSigningUp: false,
     isLoggingIn: false,
     isUpdatingProfile: false,
+    onlineUsers: [],
 
     //每次刷新页面都要check
     isCheckingAuth: true,

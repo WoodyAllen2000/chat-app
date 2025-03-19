@@ -28,7 +28,7 @@ app.use(cors({
 app.use("/api/auth", authRoutes);
 
 // 挂载 将请求传递给messageRoutes中定义的路由处理逻辑。
-app.use("/api/message", messageRoutes);
+app.use("/api/messages", messageRoutes);
 
 app.listen(PORT, () => {
     console.log("Server is running on PORT:" + PORT);
