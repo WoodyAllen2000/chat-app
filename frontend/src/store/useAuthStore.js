@@ -3,7 +3,7 @@ import { axiosInstance } from "../lib/axios";
 import toast from "react-hot-toast";
 import { io } from "socket.io-client";
 
-const BASE_URL = 'http://localhost:5001';
+const BASE_URL = import.meta.env.MODE === "development" ? 'http://localhost:5001' : "/";
 
 // create用来创建新的状态存储，参数是一个回调函数，返回一个对象定义状态存储的初始状态和更新逻辑，set是一个函数用来更新状态存储中的状态 
 export const useAuthStore = create((set, get) => ({
