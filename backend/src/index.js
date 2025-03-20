@@ -5,11 +5,9 @@ import { connectDB } from "./lib/db.js";
 import cookieParser from "cookie-parser";
 import messageRoutes from "./routes/message.route.js";
 import cors from "cors";
+import { app, server } from "./lib/socket.js";
 
 dotenv.config(); 
-
-// 创建Express.js应用实例
-const app = express();
 
 const PORT = process.env.PORT;
 
@@ -30,7 +28,7 @@ app.use("/api/auth", authRoutes);
 // 挂载 将请求传递给messageRoutes中定义的路由处理逻辑。
 app.use("/api/messages", messageRoutes);
 
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log("Server is running on PORT:" + PORT);
     connectDB();
 }); 

@@ -92,7 +92,7 @@ export const login = async (req, res) => {
     }
 };
 
-// 通过清楚cookie中的JWT完成登出操作
+// 通过清除cookie中的JWT完成登出操作
 export const logout = (req, res) => {
     try {
         res.cookie("jwt", "", {maxAge:0});

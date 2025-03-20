@@ -1,6 +1,7 @@
 import User from "../models/user.model.js";
 import Message from "../models/message.model.js";
 import cloudinary from "../lib/cloudinary.js";
+import { getReceiverSocketId, io} from '../lib/socket.js';
 
 // 得到sidebar中会显示的所有User，除了自己,类似于微信联系人列表
 export const getUsersForSideBar = async (req, res) => {
@@ -14,7 +15,7 @@ export const getUsersForSideBar = async (req, res) => {
         res.status(200).json(filteredUsers);
 
     } catch (error) {
-        console.error("Error in getUsersForSiderBar", error.message);
+        console.log("Error in getUsersForSiderBar", error.message);
         res.status(500).json({ error: "Internal Server error"});
     }
 };
@@ -67,6 +68,11 @@ export const sendMessage = async (req, res) => {
         await newMessage.save();
 
         // TODO: Realtime functionality goes here => socket.io
+        const receiverSocketId = getReceiverSocketId(receiverId);
+        if (receiverSocketId) {
+            // 向接收者发送信息
+            io.to(receiverSocketId).emit("newMessage", newMessage);
+        }
         
         res.status(201).json(newMessage);
 
